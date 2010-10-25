@@ -28,6 +28,7 @@ public class MapMarkers extends Plugin {
 	public SimpleDateFormat dateFormat;
 	public int writeInterval = 5;
 	public int staleTimeout;
+	public boolean showSpawn;
 	public Date date;
 	public Date oldDate;
 	public Calendar cal;
@@ -47,6 +48,7 @@ public class MapMarkers extends Plugin {
 	public void initialize() {
 		etc.getLoader().addListener(PluginLoader.Hook.COMMAND, listener, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.PLAYER_MOVE, listener, this, PluginListener.Priority.MEDIUM);
+		etc.getLoader().addListener(PluginLoader.Hook.LOGIN, listener, this, PluginListener.Priority.MEDIUM);
 		etc.getLoader().addListener(PluginLoader.Hook.DISCONNECT, listener, this, PluginListener.Priority.LOW);
 	}
 
@@ -62,7 +64,9 @@ public class MapMarkers extends Plugin {
 		try {
 			dateFormat = new SimpleDateFormat(properties.getString("date.format", "yyyyMMdd HH:mm:ss"));
 		} catch (IllegalArgumentException e) {
-			log.log(Level.SEVERE, LOG_PREFIX + "Invalid date format.  Please check the properties file.  For more info on the date format see here: http://goo.gl/YSes");
+			log.log(Level.SEVERE,
+					LOG_PREFIX
+							+ "Invalid date format.  Please check the properties file.  For more info on the date format see here: http://goo.gl/YSes");
 			return false;
 		} catch (NullPointerException e) {
 			log.log(Level.SEVERE,
@@ -73,6 +77,7 @@ public class MapMarkers extends Plugin {
 
 		staleTimeout = properties.getInt("stale-timeout", 300);
 		markersFile = properties.getString("markers", "world/markers.json");
+		showSpawn = properties.getBoolean("show.spawn", false);
 
 		String[] filesToCheck = { markersFile };
 		for (String f : filesToCheck) {
@@ -96,6 +101,12 @@ public class MapMarkers extends Plugin {
 
 		loadMarkers();
 
+		if (showSpawn) {
+			Location spawn = etc.getInstance().getServer().getSpawnLocation();
+			setMarker("Spawn", spawn.x, spawn.y, spawn.z, 0);
+
+			writeMarkers();
+		}
 		return true;
 
 	}
@@ -131,10 +142,12 @@ public class MapMarkers extends Plugin {
 	public synchronized boolean writeMarkers() {
 		try {
 
+			// Work out 5 minutes ago
+
 			if (staleTimeout > 0) {
 				// Remove stale markers
 				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.SECOND, -staleTimeout);
+				cal.add(Calendar.SECOND, staleTimeout);
 				date = cal.getTime();
 				int markerId = 4;
 
