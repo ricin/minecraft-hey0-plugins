@@ -290,7 +290,7 @@ public class MapMarkers extends Plugin {
 				}
 
 				setMarker(label, player.getX(), player.getY(), player.getZ(), labelId);
-				log.info(LOG_PREFIX + player.getName() + " created a new label called " + split[1] + ".");
+				log.info(LOG_PREFIX + player.getName() + " created a new label called " + label + ".");
 				player.sendMessage(Colors.Green + "Label Created!");
 
 			} else if (split[0].equalsIgnoreCase("/dellabel")) {
@@ -307,7 +307,7 @@ public class MapMarkers extends Plugin {
 
 				removeMarker(label);
 
-				log.info(LOG_PREFIX + player.getName() + " deleted a label called " + split[1] + ".");
+				log.info(LOG_PREFIX + player.getName() + " deleted a label called " + label + ".");
 				player.sendMessage(Colors.Green + "Label Deleted!");
 
 			}
