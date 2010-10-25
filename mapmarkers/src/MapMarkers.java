@@ -147,7 +147,7 @@ public class MapMarkers extends Plugin {
 			if (staleTimeout > 0) {
 				// Remove stale markers
 				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.SECOND, staleTimeout);
+				cal.add(Calendar.SECOND, -staleTimeout);
 				date = cal.getTime();
 				int markerId = 4;
 
